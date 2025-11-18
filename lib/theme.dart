@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MyThemeModel extends ChangeNotifier {
@@ -7,16 +8,25 @@ class MyThemeModel extends ChangeNotifier {
   bool _loaded = false;
   bool _useDynamicColor = false;
   bool _useMaterial3 = true;
-  bool _isImageTheme = false;
+  bool _followSystem = false;
 
   Color get themeColor => _themeColor;
-  bool get themeMode => _themeMode;
-  bool get useDynamicColor => _useDynamicColor;
-  bool get useMaterial3 => _useMaterial3;
-  bool get isImageTheme => _isImageTheme;
 
-  MyThemeModel () {
+  bool get themeMode => _themeMode;
+
+  bool get useDynamicColor => _useDynamicColor;
+
+  bool get useMaterial3 => _useMaterial3;
+
+  bool get followSystem => _followSystem;
+
+  MyThemeModel() {
     _loadFromPrefs();
+    WidgetsBinding.instance.platformDispatcher.onPlatformBrightnessChanged = () {
+      if (_followSystem) {
+        notifyListeners();
+      }
+    };
   }
 
   Future<void> _loadFromPrefs() async {
@@ -25,7 +35,7 @@ class MyThemeModel extends ChangeNotifier {
     _themeMode = prefs.getBool("themeMode") ?? true;
     _useDynamicColor = prefs.getBool("useDynamicColor") ?? false;
     _useMaterial3 = prefs.getBool("useMaterial3") ?? true;
-    _isImageTheme = prefs.getBool("isImageTheme") ?? false;
+    _followSystem = prefs.getBool("followSystem") ?? false;
     _loaded = true;
     notifyListeners();
   }
@@ -36,17 +46,26 @@ class MyThemeModel extends ChangeNotifier {
     await prefs.setBool("themeMode", _themeMode);
     await prefs.setBool("useDynamicColor", _useDynamicColor);
     await prefs.setBool("useMaterial3", _useMaterial3);
-    await prefs.setBool("isImageMode", _isImageTheme);
+    await prefs.setBool("followSystem", _followSystem);
   }
 
   void toggleMode() {
-    _themeMode = !_themeMode;
-    _saveToPrefs();
-    notifyListeners();
+    if (!_followSystem) {
+      _themeMode = !_themeMode;
+      _saveToPrefs();
+      notifyListeners();
+    }
   }
 
-  void setThemeColor(Color color,{bool needBuild = true}) {
+  void setThemeColor(
+    Color color, {
+    bool needBuild = true,
+    bool fromPicker = true,
+  }) {
     _themeColor = color;
+    if (fromPicker) {
+      _useDynamicColor = false;
+    }
     _saveToPrefs();
     if (needBuild) {
       notifyListeners();
@@ -59,31 +78,39 @@ class MyThemeModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void toggleMaterial3 () {
+  void toggleMaterial3() {
     _useMaterial3 = !_useMaterial3;
     _saveToPrefs();
     notifyListeners();
   }
 
-  void toggleImageTheme (Color color) {
-    _isImageTheme = !_isImageTheme;
-    setThemeColor(color);
+  void toggleFollowSystem() {
+    _followSystem = !_followSystem;
     _saveToPrefs();
     notifyListeners();
   }
 
   ThemeData get themeData {
+    final currentBrightness = _followSystem
+        ? WidgetsBinding.instance.platformDispatcher.platformBrightness
+        : (_themeMode ? Brightness.light : Brightness.dark);
     if (!_loaded) {
       return ThemeData(
-        colorScheme: ColorScheme.fromSeed(brightness: Brightness.light, seedColor: Colors.green),
+        colorScheme: ColorScheme.fromSeed(
+          brightness: Brightness.light,
+          seedColor: Colors.green,
+        ),
         brightness: Brightness.light,
         useMaterial3: true,
         fontFamily: "Noto",
       );
     }
     return ThemeData(
-      colorScheme: ColorScheme.fromSeed(brightness: _themeMode ? Brightness.light : Brightness.dark, seedColor: _themeColor),
-      brightness: _themeMode ? Brightness.light : Brightness.dark,
+      colorScheme: ColorScheme.fromSeed(
+        brightness: currentBrightness,
+        seedColor: _themeColor,
+      ),
+      brightness: currentBrightness,
       useMaterial3: _useMaterial3,
       fontFamily: "Noto",
     );

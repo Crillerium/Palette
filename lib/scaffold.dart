@@ -22,12 +22,12 @@ class _MyDrawerState extends State<MyDrawer> {
     Uri uri = Uri.parse("https://github.com/Crillerium/palette");
     if (!await launchUrl(uri) && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("打开失败"),
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.all(10.0),
-            duration: Duration(milliseconds: 3000),
-          )
+        SnackBar(
+          content: Text("打开失败"),
+          behavior: SnackBarBehavior.floating,
+          margin: EdgeInsets.all(10.0),
+          duration: Duration(milliseconds: 3000),
+        ),
       );
     }
   }
@@ -96,8 +96,12 @@ class _MyFloatingButtonState extends State<MyFloatingButton> {
     final themeModel = Provider.of<MyThemeModel>(context);
     return FloatingActionButton(
       onPressed: themeModel.toggleMode,
-      tooltip: themeModel.themeMode ? "日间模式" : "夜间模式",
-      child: Icon(themeModel.themeMode ? Icons.light_mode : Icons.dark_mode),
+      tooltip: themeModel.followSystem
+          ? "跟随系统"
+          : (themeModel.themeMode ? "日间模式" : "夜间模式"),
+      child: themeModel.followSystem
+          ? Icon(Icons.auto_mode)
+          : Icon(themeModel.themeMode ? Icons.light_mode : Icons.dark_mode),
     );
   }
 }

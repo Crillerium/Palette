@@ -26,7 +26,7 @@ class MyHomePage extends StatelessWidget {
             provider: imageProvider,
             brightness: Brightness.light,
           );
-          themeModel.toggleImageTheme(scheme.primary);
+          themeModel.setThemeColor(scheme.primary);
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -72,72 +72,78 @@ class MyHomePage extends StatelessWidget {
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 80),
         child: Center(
-        child: Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.palette_outlined),
-                  title: const Text("选择颜色"),
-                  trailing: FilledButton.tonal(
-                    // 更符合 M3 的按钮
-                    onPressed: () {
-                      setColorFromImage();
-                    },
-                    child: const Text("从图片获取"),
+          child: Card(
+            margin: const EdgeInsets.symmetric(horizontal: 16),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.palette_outlined),
+                    title: const Text("选择颜色"),
+                    trailing: FilledButton.tonal(
+                      // 更符合 M3 的按钮
+                      onPressed: () {
+                        setColorFromImage();
+                      },
+                      child: const Text("从图片获取"),
+                    ),
                   ),
-                ),
 
-                const Divider(),
+                  const Divider(),
 
-                SizedBox(
-                  width: double.infinity,
-                  child: Padding(
-                    padding: const EdgeInsets.all(6),
+                  SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
 
-                    child: ColorPicker(
-                      // Use the screenPickerColor as start and active color.
-                      color: themeModel.themeColor,
-                      // Update the screenPickerColor using the callback.
-                      onColorChanged: (Color color) =>
-                          themeModel.setThemeColor(color),
-                      width: 44,
-                      height: 44,
-                      borderRadius: 22,
-                      heading: Text(
-                        '选择颜色',
-                        style: Theme.of(context).textTheme.headlineSmall,
-                      ),
-                      subheading: Text(
-                        '选择色调',
-                        style: Theme.of(context).textTheme.titleSmall,
+                      child: ColorPicker(
+                        // Use the screenPickerColor as start and active color.
+                        color: themeModel.themeColor,
+                        // Update the screenPickerColor using the callback.
+                        onColorChanged: (Color color) =>
+                            themeModel.setThemeColor(color),
+                        width: 44,
+                        height: 44,
+                        borderRadius: 22,
+                        heading: Text(
+                          '选择颜色',
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                        subheading: Text(
+                          '选择色调',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                const Divider(),
-                SwitchListTile(
-                  secondary: const Icon(Icons.design_services_outlined),
-                  title: const Text("使用 Material 3 设计"),
-                  value: themeModel.useMaterial3,
-                  onChanged: (_) => themeModel.toggleMaterial3(),
-                ),
-
-                SwitchListTile(
-                  secondary: const Icon(Icons.auto_awesome),
-                  title: const Text("使用系统动态配色"),
-                  value: themeModel.useDynamicColor,
-                  onChanged: (_) => themeModel.toggleDynamic(),
-                ),
-              ],
+                  const Divider(),
+                  SwitchListTile(
+                    secondary: const Icon(Icons.design_services_outlined),
+                    title: const Text("使用 Material 3 设计"),
+                    value: themeModel.useMaterial3,
+                    onChanged: (_) => themeModel.toggleMaterial3(),
+                  ),
+                  SwitchListTile(
+                    secondary: const Icon(Icons.auto_awesome),
+                    title: const Text("使用系统动态配色"),
+                    value: themeModel.useDynamicColor,
+                    onChanged: (_) => themeModel.toggleDynamic(),
+                  ),
+                  SwitchListTile(
+                    secondary: const Icon(Icons.auto_mode),
+                    title: const Text("主题模式跟随系统"),
+                    value: themeModel.followSystem,
+                    onChanged: (_) => themeModel.toggleFollowSystem(),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),),
+      ),
       floatingActionButton: MyFloatingButton(),
     );
   }
