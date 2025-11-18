@@ -36,7 +36,7 @@ on:
         description: 'Release tag (e.g. v1.5.0)'
         type: string
         required: true
-        default: v${{ github.run_number }}
+        default: v1.0.0
 
 env:
   RELEASE_TAG: ${{ inputs.release_tag }}
