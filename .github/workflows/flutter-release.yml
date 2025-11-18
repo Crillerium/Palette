@@ -111,7 +111,9 @@ jobs:
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
-        with: { channel: ${{ inputs.flutter_channel }}, cache: true }
+        with:
+          channel: ${{ inputs.flutter_channel }}
+          cache: true
 
       - name: Enable & pub get
         run: |
